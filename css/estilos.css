@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+:root{
+    --transparent: rgba(2, 2, 2, 0.5); 
+    --goldgrad:linear-gradient(gold,rgb(255, 123, 0));
+}
+
+body{    
+     background-image: var(--goldgrad);     
+    min-height: 97.8vh;
+    
+    font-family: 'Roboto', sans-serif;
+    -webkit-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    -o-transition: all 1s ease-in-out;
+    -ms-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;    
+}
+
+
+
+h1{
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 5%;
+}
+
+label{
+    margin-right: 1%;
+}
+
+.div{
+    font-size: 1.3rem;
+    border: 1px solid black;
+    text-align: center;
+    border-radius: 4px;
+    padding-top:2%;
+    width: 600px;
+    margin: 0 auto;
+    background-color: rgb(253, 220, 148);
+}
+
+input{
+    border: none;
+    border-radius: 3px;
+    font-size: 1.3rem;
+}
+
+#numero{
+    border-radius: 3px;
+    
+}
+
+.boton{
+    display: block;
+    padding: 1%;
+    margin: 2% auto;
+    border: 1px solid rgb(114, 114, 114);
+    background:var(--goldgrad);
+    transition-duration: 0.3s;
+}
+
+.boton:hover:enabled{
+    padding: 1% 2%;
+}
+
+.diverror{
+    animation: error 0.4s;
+    
+}
+
+@keyframes error{
+    25%{
+        transform: translateX(-5px);
+    }
+    50%{
+        transform: translateX(10px);
+    }
+    75%{
+        transform: translateX(-10px);
+    }
+    100%{
+        transform: translateX(0px);
+    }
+}
+
+#top5{
+    margin-top: 5%;
+    
+}
+
+ul{
+    display: flex;
+    justify-content: space-around;
+    list-style: none;    
+}
+
+li{
+    transition-duration:0.3s;
+}
+
+li:hover{
+    color: rgb(116, 98, 0);
+}
+
+li:focus{
+    color: rgb(116, 98, 0);
+}
+
+
+
+table{
+   margin: 3px auto; 
+    border-collapse: collapse;    
+    font-size: 0.9rem;
+    min-width: 700px;
+    border-radius: 2%;
+    text-align: left;
+}
+
+h2,h3{
+    color: var(--transparent);    
+}
+
+table thead tr{    
+    color: rgb(230, 227, 227);   
+    background-color: var(--transparent);
+    font-weight: bold;
+}
+
+table th,table td{
+    padding: 12px 15px;
+}
+
+table tbody tr{
+    border-bottom: 1px solid grey;
+}
+
+#main h1{
+    animation: zoomIn 3s;
+    animation-iteration-count: infinite;   
+}
+
+section img{
+    transition-duration: 1s;
+}
+
+section img:hover{
+    scale: 1.2;
+}
+
+@keyframes zoomIn{
+
+0% {
+    transform: scale(1, 1);
+    opacity: 0.8;
+}
+50% {
+    transform: scale(1.1, 1.1);
+    opacity: 1;
+}
+
+100% {
+    transform: scale(1, 1);
+    opacity: 0.8;
+}
+
+}
