@@ -29,7 +29,7 @@ label{
     margin-right: 1%;
 }
 
-.div{
+div{
     font-size: 1.3rem;
     border: 1px solid black;
     text-align: center;
@@ -165,4 +165,12 @@ section img:hover{
     opacity: 0.8;
 }
 
+}
+
+h2,h3{
+    text-align: center;
+}
+
+#two div{
+    margin-top: 5%
 }

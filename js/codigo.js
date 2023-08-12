@@ -1,12 +1,15 @@
 //#region Variables
 let ganador = Math.floor(Math.random() * 100) + 1;
+let ganadorVs = Math.floor(Math.random() * 20) + 1;
 let intentos = 0;
+let victorias = 0;
 const chances = 5;
 const refresca = "Si querés volver a jugar, refrescá la página.";
 let tabla = document.createElement('table')
 let tablaJugadores = document.querySelector("#top5");
 let ul = tablaJugadores.getElementsByTagName("ul");
-
+let nombreJugador = '';
+let procedenciaJugador = '';
 const colorVictorioso = 'rgb(171, 250, 171)';
 //#endregion
 
@@ -31,6 +34,7 @@ function singlePlayer(){
 function vsBtn(){
     document.getElementById("main").style.display = "none"
     document.getElementById("two").style.display = "block"
+    consultarJugadorNuevo();
 }
 
 
@@ -77,8 +81,7 @@ const agregarFelicitaciones = function(texto){
 
 const consultarJugadorNuevo = function(){
     
-    let nombreJugador = '';
-    let procedenciaJugador = '';
+    
     while(nombreJugador == '' || nombreJugador == undefined || nombreJugador == null){
         nombreJugador = prompt('Como te llamas?');
     }    
@@ -86,19 +89,32 @@ const consultarJugadorNuevo = function(){
     while(procedenciaJugador == '' || procedenciaJugador == undefined || procedenciaJugador == null){
         procedenciaJugador = prompt('De donde eres?');
     }
+    
+    jugadorNuevo.nombre = nombreJugador;
     jugadorNuevo.procedencia = procedenciaJugador;
     jugadorNuevo.intentos = intentos;
+    jugadorNuevo.victorias = 0;
     jugadoresPrecargados.unshift(jugadorNuevo);
-    
-    
+    jugadoresOrdenados = jugadoresPrecargados.sort((a,b) => a.intentos - b.intentos || a.nombre.localeCompare(b.nombre));
+        
+}
+
+
+function existeJugador(nombreJ,procedenciaJ){
+    let retorno;
+    (obtenerJugador(nombreJ,procedenciaJ)!= null)? retorno = true:retorno = false;
+    return retorno;
 }
 
 function numeroIncorrecto(numero) {
-    document.querySelector("#div1").classList.remove("diverror")
-    document.querySelector("#div1").offsetWidth;
-    document.querySelector("#div1").classList.add("diverror")
-    document.querySelector("#div1").onanimationend = () => alert("Incorrecto, te quedan " + (chances-intentos) + " chances. Pista: " + pistaNumero(numero, chances - intentos));
+    let div = document.getElementsByTagName("div")[1]   
+    div.classList.remove("diverror")
+    div.offsetWidth;
+    div.classList.add("diverror")
+    div.onanimationend = () => alert("Incorrecto, te quedan " + (chances-intentos) + " chances. Pista: " + pistaNumero(numero, chances - intentos));
 }
+
+document.querySelector("#boton").addEventListener("click",ingresarNumero)
 
 function ingresarNumero() {
     let numero = Number(document.querySelector("#numero").value);
@@ -112,11 +128,81 @@ function ingresarNumero() {
             break;
         }
     if (consultarNumero(numero)){
-        consultarJugadorNuevo();
+        consultarJugadorNuevo();        
         tuResultado(colorVictorioso, `Felicidades ${jugadorNuevo.nombre}, adivinaste el número! `);
     }
     
     else if (intentos == chances) tuResultado('red', "Lo sentimos, perdiste la partida. El correcto erá: " + ganador + ". ");
+}
+
+document.querySelector("#botonVs").addEventListener("click",ingresarNumeroVs)
+
+console.log("Ganador vs: " + ganadorVs)
+console.log("Ganador 5 intentos: " + ganador)
+
+
+let numerosElegidosRival = []
+let numeroRival = Math.floor(Math.random() * 20) + 1;
+
+function ingresarNumeroVs(){        
+    let tuNumero = Number(document.querySelector("#tuNumero").value);    
+    
+    let ganasteTu = false;
+    let ganoRival = false;
+    
+    if (tuNumero > 20 || tuNumero < 1) alert("El número debe estar entre 1 y 20.")
+    else{    
+    if(!ganasteTu && !ganoRival){
+    
+        while(!noEsta(numeroRival,numerosElegidosRival)){
+            numeroRival = Math.floor(Math.random() * 20) + 1;
+        }
+        document.querySelector("#respuestaRival").innerHTML = ` ${numeroRival}`
+        console.log(numeroRival)
+        numerosElegidosRival.push(numeroRival)
+        ganasteTu = tuNumero == ganadorVs
+        ganoRival = numeroRival == ganadorVs        
+        numerosElegidosRival.push(numeroRival)
+        console.log(numeroRival)
+    }        
+}    
+    (ganasteTu && !ganoRival)?alert("Felicidades, ganaste."):(ganoRival)?alert("Gano tu Rival"):alert("Sigan participando!")
+    if(ganasteTu){
+        numeroElegidosRival = []        
+        aumentarVictorias(nombreJugador,procedenciaJugador);
+    }  
+    
+    
+}
+
+function noEsta(num,arr){
+    for(let i = 0;i<arr.length;i++){
+        if(arr[i] == num) return false
+    }
+    return true
+}
+
+
+function obtenerJugador(nombreJugador,procedenciaJugador){
+    for(let i = 0;i<jugadoresPrecargados.length;i++){
+        console.log(jugadoresPrecargados[i].nombre)
+        console.log(nombreJugador)
+         if(jugadoresPrecargados[i].nombre == nombreJugador && jugadoresPrecargados[i].procedencia == procedenciaJugador) return jugadoresPrecargados[i];
+    }
+     return null;
+}
+
+function aumentarVictorias(nombreJugador,procedenciaJugador){ 
+    
+    obtenerJugador(nombreJugador,procedenciaJugador).victorias +=1;
+}
+
+function actualizarIntentos(nombreJugador,procedenciaJugador,intentos){
+    console.log(nombreJugador)
+    console.log(procedenciaJugador)
+   let jugador = obtenerJugador(nombreJugador,procedenciaJugador)
+     
+     if(jugador.intentos < intentos) jugador.intentos = intentos;
 }
 
 const consultarNumero = (numero) => numero == ganador;
@@ -166,9 +252,9 @@ function pistaNumero(numero, chances) {
     return pista;
 }
 
-const figuraEnTop5 = function(objeto,top5){
-    if(objeto == top5[0])agregarFelicitaciones('Sos el mejor jugador! Te recomendamos que juegues a la quiniela.')
-    for(let i = 1; i < top5.length;i++)
+const figuraEnTop5 = function(objeto,array){
+    if(objeto == array[0])agregarFelicitaciones('Sos el mejor jugador! Te recomendamos que juegues a la quiniela.')
+    for(let i = 1; i < array.length;i++)
     if (objeto == top5[i]){
         agregarFelicitaciones('Felicitaciones! Estas en el top 5.');
         break
@@ -200,10 +286,11 @@ function tuResultado(color, texto) {
 //#region Objetos
 
 class Jugador{
-    constructor(n,p,i){
+    constructor(n,p,i,v){
         this.nombre = n,
         this.procedencia = p,
-        this.intentos = i
+        this.intentos = i,
+        this.victorias = v
         
     }
 }
@@ -214,126 +301,150 @@ let jugadoresPrecargados = [
     {
         "nombre":'xxXJuancit00Xxx',
         "procedencia":'Nirvana',
-        "intentos": (Math.random() * (5-3) + 3).toFixed(0)        
+        "intentos": (Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":3        
     },
     {
         "nombre":'Yeluzzzz',
         "procedencia":'Cordoba',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":3
     },
     {
         "nombre":'MatiCNdeF',
         "procedencia":'Barros Blancos',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":3
     },
     {
         "nombre":'Miliiii<3',
         "procedencia":'BarbieWorld',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":3
     },
     {
         "nombre":'Ruben Silva',
         "procedencia":'Buenos Aires, Argentina.',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":3
     },
     {
         "nombre":'L0rdV0lde3m0rt',
         "procedencia":'Slytheryn',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'RauwwwPasoMolino',
         "procedencia":'Del Paso Molino yatusabe',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":2
     },
     {
         "nombre":'Maluma Maluma',
         "procedencia":'ARG',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'D.Martinss',
         "procedencia":'NovoHamburgo',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'Yenderson.C',
         "procedencia":'Varadero',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":2
     },
     {
         "nombre":'ManuelAA',
         "procedencia":'IslaDelEntretenimiento',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'卢卡斯 ',
         "procedencia":'台湾',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":2
     },
     {
         "nombre":'伊莎贝尔',
         "procedencia":'上海',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'L4P1ZZZconsciente',
         "procedencia":'RD',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'YOLOSwaGG',
         "procedencia":'LA',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'LuuuGonzalez2000',
         "procedencia":'Corrientes',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":2
     },
     {
         "nombre":'VanessaSoarez99',
         "procedencia":'BahiaBR',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'Pipitaaa12',
         "procedencia":'CABJ',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":2
     },
     {
         "nombre":'444555Luahn',
         "procedencia":'Shangai',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'RobertoCarlos',
         "procedencia":'?',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'JoaoLema',
         "procedencia":'BR<3',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'Chiníítáá',
         "procedencia":'Marte',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'xXLulzzXx',
         "procedencia":'Andromeda',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":1
     },
     {
         "nombre":'Farruko ;)',
         "procedencia":'PR',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0)
+        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
+        "victorias":2
     },
 ]
 
-let jugadoresOrdenados = jugadoresPrecargados.sort((a,b) => a.intentos - b.intentos || a.nombre.localeCompare(b.nombre));    
+let jugadoresOrdenados;    
 
 //#endregion
 
