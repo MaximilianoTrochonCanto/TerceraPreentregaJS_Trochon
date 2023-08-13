@@ -3,139 +3,199 @@ let ganador = Math.floor(Math.random() * 100) + 1;
 let ganadorVs = Math.floor(Math.random() * 20) + 1;
 let intentos = 0;
 let victorias = 0;
-const chances = 5;
-const refresca = "Si querés volver a jugar, refrescá la página.";
 let tabla = document.createElement('table')
+let tablaVs = document.querySelector("#tablaVs");
 let tablaJugadores = document.querySelector("#top5");
-let ul = tablaJugadores.getElementsByTagName("ul");
+let h2Single = tablaJugadores.getElementsByTagName("h2")[0]
+let h2Vs = tablaVs.getElementsByTagName("h2")[0]
+const chances = 5;
+let partidoFinalizado = false;
+const refresca = "Si querés volver a jugar, refrescá la página.";
+let ulSingle = tablaJugadores.getElementsByTagName("ul")[0];
+let ulVs = tablaVs.getElementsByTagName("ul")[0];
+console.log(ulVs + "," + ulSingle)
 let nombreJugador = '';
 let procedenciaJugador = '';
+let jugadores = []
+
 const colorVictorioso = 'rgb(171, 250, 171)';
 //#endregion
 
 //#region Funciones
 
-const esconderSecciones = function(){
+const esconderSecciones = function () {
     document.getElementById("one").style.display = "none"
     document.getElementById("two").style.display = "none"
     document.getElementById("main").style.display = "block"
-} 
+}
 
 esconderSecciones();
 
-document.querySelector("#singlePlayer").addEventListener("click",singlePlayer)
-document.querySelector("#vsBtn").addEventListener("click",vsBtn)
+document.querySelector("#singlePlayer").addEventListener("click", singlePlayer)
+document.querySelector("#vsBtn").addEventListener("click", vsBtn)
 
-function singlePlayer(){
+function singlePlayer() {
+    if (partidoFinalizado) {
+        alert(refresca)
+        document.querySelector("#singlePlayer").disabled = true;
+    }
+    else {
+        document.getElementById("main").style.display = "none"
+        document.getElementById("one").style.display = "block"
+    }
+
+}
+
+function vsBtn() {
     document.getElementById("main").style.display = "none"
-    document.getElementById("one").style.display = "block"
-}
-
-function vsBtn(){
-    document.getElementById("main").style.display = "none"
-    document.getElementById("two").style.display = "block"
-    consultarJugadorNuevo();
+    document.getElementById("two").style.display = "block"    
+    consultarJugadorNuevo("vs");
 }
 
 
-const crearTabla = function(){                
-    tabla.innerHTML = `<thead><tr><th>Nombre</th><th>Procedencia</th><th>Intentos</th></tr></thead>`
-    
-}
+const crearTabla = (parametro) => tabla.innerHTML = `<thead><tr><th>Nombre</th><th>Procedencia</th><th>${parametro}</th></tr></thead>`
 
-function crearLinks(h2,top5){    
+
+
+function crearLinks(top5,criterio){    
     let li1 = document.createElement("li");
     li1.textContent = "Ver todos"        
+    let h2;        
+    let ul;
+    (criterio == "intentos")?h2 = h2Single:h2 = h2Vs;
+    (criterio == "intentos")?ul = ulSingle:ul = ulVs;
+    console.log(ul)
+    h2.innerHTML = "Top 5 Jugadores"
     li1.addEventListener("click",function(){
-        h2.innerHTML = "Ganadores de hoy"
-        crearTabla();
-        
-        rellenarTabla(jugadoresPrecargados)            
-
+        h2.innerHTML = "Ganadores de hoy"                
+        crearTabla(criterio);        
+        (criterio == "intentos")?rellenarTabla(ordenarJugadores(criterio)):rellenaTablaVictorias(ordenarJugadores(criterio))            
     })
     let li2 = document.createElement("li");
     li2.textContent = "Ver top 5"        
     li2.addEventListener("click",
     function(){
-        h2.innerHTML = "Top 5 jugadores"
-        crearTabla();
-        
-        rellenarTabla(top5)        
+        h2.innerHTML = "Top 5 jugadores"        
+        crearTabla(criterio);        
+        (criterio == "intentos")?rellenarTabla(top5):rellenaTablaVictorias(top5)            
     })
-    ul[0].appendChild(li1)
-    ul[0].appendChild(li2)
+    console.log(li1 + "," + li2)
+    
+        ul.appendChild(li1)
+        ul.appendChild(li2)    
+        
+    
     
 
     
 }
 
-
 const listar = (a) => tabla.innerHTML += `<tbody><tr><td>${a.nombre}</td><td>${a.procedencia}</td><td>${a.intentos}</td></tr></tbody>`
+const llenarVs = (a) => tabla.innerHTML += `<tbody><tr><td>${a.nombre}</td><td>${a.procedencia}</td><td>${a.victorias}</td></tr></tbody>`
 const rellenarTabla = (j) => j.forEach(listar);
+const rellenaTablaVictorias = (j) => j.forEach(llenarVs)
 
-const agregarFelicitaciones = function(texto){
-    let h3 = document.createElement('h3');    
-    h3.innerHTML = texto;    
+const agregarFelicitaciones = function (texto) {
+    let h3 = document.createElement('h3');
+    h3.innerHTML = texto;
     tablaJugadores.appendChild(h3);
 }
 
-const consultarJugadorNuevo = function(){
-    
-    
-    while(nombreJugador == '' || nombreJugador == undefined || nombreJugador == null){
+
+
+const consultarJugadorNuevo = function (modo) {
+
+
+    while (nombreJugador == '' || nombreJugador == undefined || nombreJugador == null) {
         nombreJugador = prompt('Como te llamas?');
-    }    
+    }
     jugadorNuevo.nombre = nombreJugador;
-    while(procedenciaJugador == '' || procedenciaJugador == undefined || procedenciaJugador == null){
+    while (procedenciaJugador == '' || procedenciaJugador == undefined || procedenciaJugador == null) {
         procedenciaJugador = prompt('De donde eres?');
     }
-    
     jugadorNuevo.nombre = nombreJugador;
-    jugadorNuevo.procedencia = procedenciaJugador;
-    jugadorNuevo.intentos = intentos;
-    jugadorNuevo.victorias = 0;
-    jugadoresPrecargados.unshift(jugadorNuevo);
-    jugadoresOrdenados = jugadoresPrecargados.sort((a,b) => a.intentos - b.intentos || a.nombre.localeCompare(b.nombre));
-        
+    jugadorNuevo.procedencia = procedenciaJugador;            
+    if(modo == "single"){
+        jugadorNuevo.intentos = intentos;
+    if(!existeJugador(jugadorNuevo.nombre, jugadorNuevo.procedencia)){
+        jugadorNuevo.victorias = 0;
+        jugadores.unshift(jugadorNuevo) 
+        }else{
+            sobrescribirIntentos(jugadorNuevo)
+        }     
+    }else{
+        jugadorNuevo.nombre = nombreJugador;
+        jugadorNuevo.procedencia = procedenciaJugador;
+        if(!existeJugador(jugadorNuevo.nombre, jugadorNuevo.procedencia)){
+            jugadorNuevo.victorias = 1;
+            jugadorNuevo.intentos = 0;
+            jugadores.unshift(jugadorNuevo)
+        }else{
+            sobrescribirVictorias(jugadorNuevo);
+        } 
+    }
+    sincronizarStorage();
+    
 }
 
 
-function existeJugador(nombreJ,procedenciaJ){
+
+function ordenarJugadores(criterio){
+    let jugadoresOrdenados;
+    (criterio=="intentos")?jugadoresOrdenados = jugadores.sort((a, b) => a.intentos - b.intentos || a.nombre.localeCompare(b.nombre)).filter((j) => j.intentos > 0):jugadoresOrdenados = jugadores.sort((a, b) => a.victorias - b.victorias || a.nombre.localeCompare(b.nombre)).filter((j) => j.victorias > 0)
+    return jugadoresOrdenados;    
+}
+
+function sobrescribirIntentos(jugadorEspecifico) {
+    if(jugadorEspecifico.intentos<obtenerJugador(jugadorEspecifico.nombre, jugadorEspecifico.procedencia).intentos)obtenerJugador(jugadorEspecifico.nombre, jugadorEspecifico.procedencia).intentos = jugadorEspecifico.intentos
+}
+
+function sobrescribirVictorias(jugadorEspecifico){
+    obtenerJugador(jugadorEspecifico.nombre, jugadorEspecifico.procedencia).victorias++;
+}
+
+function existeJugador(nombreJ, procedenciaJ) {
     let retorno;
-    (obtenerJugador(nombreJ,procedenciaJ)!= null)? retorno = true:retorno = false;
+    (obtenerJugador(nombreJ, procedenciaJ) != null) ? retorno = true : retorno = false;
     return retorno;
 }
 
 function numeroIncorrecto(numero) {
-    let div = document.getElementsByTagName("div")[1]   
+    let div = document.getElementsByTagName("div")[1]
     div.classList.remove("diverror")
     div.offsetWidth;
     div.classList.add("diverror")
-    div.onanimationend = () => alert("Incorrecto, te quedan " + (chances-intentos) + " chances. Pista: " + pistaNumero(numero, chances - intentos));
+    div.onanimationend = () => alert("Incorrecto, te quedan " + (chances - intentos) + " chances. Pista: " + pistaNumero(numero, chances - intentos));
 }
 
-document.querySelector("#boton").addEventListener("click",ingresarNumero)
+document.querySelector("#boton").addEventListener("click", ingresarNumero)
 
 function ingresarNumero() {
     let numero = Number(document.querySelector("#numero").value);
-    if (numero > 100 || numero < 1) alert("El número debe estar entre 1 y 100.")
-    else
-        for (let i = 0; i <= chances; i++) {
-            intentos++;
-            if (!consultarNumero(numero)) {                                
-                if (intentos < chances) numeroIncorrecto(numero);
+    if (!partidoFinalizado) {
+        if (numero > 100 || numero < 1) alert("El número debe estar entre 1 y 100.")
+        else
+            if (!partidoFinalizado) {
+
+                for (let i = 0; i <= chances; i++) {
+                    intentos++;
+                    if (!consultarNumero(numero)) {
+                        if (intentos < chances) numeroIncorrecto(numero);
+                    }
+                    break;
+                }
+                if (consultarNumero(numero)) {
+                    consultarJugadorNuevo("single");
+                    tuResultado(colorVictorioso, `Felicidades ${jugadorNuevo.nombre}, adivinaste el número! `);
+                }
+                else if (intentos == chances) tuResultado('red', "Lo sentimos, perdiste la partida. El correcto erá: " + ganador + ". ");
             }
-            break;
-        }
-    if (consultarNumero(numero)){
-        consultarJugadorNuevo();        
-        tuResultado(colorVictorioso, `Felicidades ${jugadorNuevo.nombre}, adivinaste el número! `);
     }
-    
-    else if (intentos == chances) tuResultado('red', "Lo sentimos, perdiste la partida. El correcto erá: " + ganador + ". ");
+
+
 }
 
-document.querySelector("#botonVs").addEventListener("click",ingresarNumeroVs)
+document.querySelector("#botonVs").addEventListener("click", ingresarNumeroVs)
 
 console.log("Ganador vs: " + ganadorVs)
 console.log("Ganador 5 intentos: " + ganador)
@@ -144,65 +204,56 @@ console.log("Ganador 5 intentos: " + ganador)
 let numerosElegidosRival = []
 let numeroRival = Math.floor(Math.random() * 20) + 1;
 
-function ingresarNumeroVs(){        
-    let tuNumero = Number(document.querySelector("#tuNumero").value);    
-    
+function ingresarNumeroVs() {
+    let tuNumero = Number(document.querySelector("#tuNumero").value);
+
     let ganasteTu = false;
     let ganoRival = false;
-    
+
     if (tuNumero > 20 || tuNumero < 1) alert("El número debe estar entre 1 y 20.")
-    else{    
-    if(!ganasteTu && !ganoRival){
-    
-        while(!noEsta(numeroRival,numerosElegidosRival)){
-            numeroRival = Math.floor(Math.random() * 20) + 1;
+    else {
+        if (!ganasteTu && !ganoRival) {
+
+            while (!noEsta(numeroRival, numerosElegidosRival)) {
+                numeroRival = Math.floor(Math.random() * 20) + 1;
+            }
+            document.querySelector("#respuestaRival").innerHTML = ` ${numeroRival}`
+            
+            numerosElegidosRival.push(numeroRival)
+            ganasteTu = tuNumero == ganadorVs
+            ganoRival = numeroRival == ganadorVs
+            numerosElegidosRival.push(numeroRival)
+            
         }
-        document.querySelector("#respuestaRival").innerHTML = ` ${numeroRival}`
-        console.log(numeroRival)
-        numerosElegidosRival.push(numeroRival)
-        ganasteTu = tuNumero == ganadorVs
-        ganoRival = numeroRival == ganadorVs        
-        numerosElegidosRival.push(numeroRival)
-        console.log(numeroRival)
-    }        
-}    
-    (ganasteTu && !ganoRival)?alert("Felicidades, ganaste."):(ganoRival)?alert("Gano tu Rival"):alert("Sigan participando!")
-    if(ganasteTu){
-        numeroElegidosRival = []        
-        aumentarVictorias(nombreJugador,procedenciaJugador);
-    }  
+        if(ganasteTu || ganoRival){
+            numeroElegidosRival = []            
+            crearTabla("victorias");
+            crearLinks(ordenarJugadores("victorias").slice(0,5),"victorias")            
+            rellenaTablaVictorias(ordenarJugadores("victorias"))
+            tablaVs.appendChild(tabla)                               
+        }
+    }
+    (ganasteTu && !ganoRival) ? alert("Felicidades, ganaste.") : (ganoRival && !ganasteTu) ? alert("Gano tu Rival") : (!ganasteTu && !ganoRival)? alert("Sigan participando!"):alert("Felicidades, ganaste.")
     
     
+
 }
 
-function noEsta(num,arr){
-    for(let i = 0;i<arr.length;i++){
-        if(arr[i] == num) return false
+
+
+function noEsta(num, arr) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] == num) return false
     }
     return true
 }
 
 
-function obtenerJugador(nombreJugador,procedenciaJugador){
-    for(let i = 0;i<jugadoresPrecargados.length;i++){
-        console.log(jugadoresPrecargados[i].nombre)
-        console.log(nombreJugador)
-         if(jugadoresPrecargados[i].nombre == nombreJugador && jugadoresPrecargados[i].procedencia == procedenciaJugador) return jugadoresPrecargados[i];
+function obtenerJugador(nombreJugador, procedenciaJugador) {
+    for (let i = 0; i < jugadores.length; i++) {        
+        if (jugadores[i].nombre == nombreJugador && jugadores[i].procedencia == procedenciaJugador) return jugadores[i];
     }
-     return null;
-}
-
-function aumentarVictorias(nombreJugador,procedenciaJugador){ 
-    
-    obtenerJugador(nombreJugador,procedenciaJugador).victorias +=1;
-}
-
-function actualizarIntentos(nombreJugador,procedenciaJugador,intentos){
-    console.log(nombreJugador)
-    console.log(procedenciaJugador)
-   let jugador = obtenerJugador(nombreJugador,procedenciaJugador)
-     
-     if(jugador.intentos < intentos) jugador.intentos = intentos;
+    return null;
 }
 
 const consultarNumero = (numero) => numero == ganador;
@@ -248,36 +299,35 @@ function pistaNumero(numero, chances) {
                 pista = "El numero es mayor a 90 y es "
         }
     }
-    (numero > ganador)? pista += "menor al número que pusiste.": pista += "mayor al número que pusiste."
+    (numero > ganador) ? pista += "menor al número que pusiste." : pista += "mayor al número que pusiste."
     return pista;
 }
 
-const figuraEnTop5 = function(objeto,array){
-    if(objeto == array[0])agregarFelicitaciones('Sos el mejor jugador! Te recomendamos que juegues a la quiniela.')
-    for(let i = 1; i < array.length;i++)
-    if (objeto == top5[i]){
-        agregarFelicitaciones('Felicitaciones! Estas en el top 5.');
-        break
-    }    
+const figuraEnTop5 = function (objeto, array) {
+    if (objeto == array[0]) agregarFelicitaciones('Sos el mejor jugador! Te recomendamos que juegues a la quiniela.')
+    for (let i = 1; i < array.length; i++)
+        if (objeto == top5[i]) {
+            agregarFelicitaciones('Felicitaciones! Estas en el top 5.');
+            break
+        }
 }
 
-function tuResultado(color, texto) {                   
-    document.querySelector("#boton").disabled = true;
+function tuResultado(color, texto) {
     document.querySelector("#body").style.background = color;
-    alert(texto + refresca);    
-    crearTabla();
-    let top5 = jugadoresOrdenados.slice(0,5);
-    let h2 = tablaJugadores.getElementsByTagName("h2")[0]
-    h2.innerHTML = "Top 5 jugadores"
-    crearLinks(h2,top5);
-    rellenarTabla(top5);
-    tablaJugadores.appendChild(tabla);    
-    figuraEnTop5(jugadorNuevo,top5)
-} 
+    partidoFinalizado = true;
+    document.querySelector("#boton").disabled = true
+    alert(texto + refresca);        
+    let top5 = ordenarJugadores("intentos").slice(0, 5);        
+    crearTabla("intentos")
+    rellenarTabla(top5)
+    crearLinks(top5,"intentos");    
+    tablaJugadores.appendChild(tabla);
+    figuraEnTop5(jugadorNuevo, top5)
+}
 
 
-    
-    
+
+
 
 
 
@@ -285,172 +335,31 @@ function tuResultado(color, texto) {
 
 //#region Objetos
 
-class Jugador{
-    constructor(n,p,i,v){
+class Jugador {
+    constructor(n, p, i, v) {
         this.nombre = n,
-        this.procedencia = p,
-        this.intentos = i,
-        this.victorias = v
-        
+            this.procedencia = p,
+            this.intentos = i,
+            this.victorias = v
+
     }
 }
 
 let jugadorNuevo = new Jugador()
 
-let jugadoresPrecargados = [
-    {
-        "nombre":'xxXJuancit00Xxx',
-        "procedencia":'Nirvana',
-        "intentos": (Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":3        
-    },
-    {
-        "nombre":'Yeluzzzz',
-        "procedencia":'Cordoba',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":3
-    },
-    {
-        "nombre":'MatiCNdeF',
-        "procedencia":'Barros Blancos',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":3
-    },
-    {
-        "nombre":'Miliiii<3',
-        "procedencia":'BarbieWorld',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":3
-    },
-    {
-        "nombre":'Ruben Silva',
-        "procedencia":'Buenos Aires, Argentina.',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":3
-    },
-    {
-        "nombre":'L0rdV0lde3m0rt',
-        "procedencia":'Slytheryn',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'RauwwwPasoMolino',
-        "procedencia":'Del Paso Molino yatusabe',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":2
-    },
-    {
-        "nombre":'Maluma Maluma',
-        "procedencia":'ARG',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'D.Martinss',
-        "procedencia":'NovoHamburgo',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'Yenderson.C',
-        "procedencia":'Varadero',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":2
-    },
-    {
-        "nombre":'ManuelAA',
-        "procedencia":'IslaDelEntretenimiento',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'卢卡斯 ',
-        "procedencia":'台湾',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":2
-    },
-    {
-        "nombre":'伊莎贝尔',
-        "procedencia":'上海',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'L4P1ZZZconsciente',
-        "procedencia":'RD',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'YOLOSwaGG',
-        "procedencia":'LA',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'LuuuGonzalez2000',
-        "procedencia":'Corrientes',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":2
-    },
-    {
-        "nombre":'VanessaSoarez99',
-        "procedencia":'BahiaBR',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'Pipitaaa12',
-        "procedencia":'CABJ',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":2
-    },
-    {
-        "nombre":'444555Luahn',
-        "procedencia":'Shangai',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'RobertoCarlos',
-        "procedencia":'?',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'JoaoLema',
-        "procedencia":'BR<3',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'Chiníítáá',
-        "procedencia":'Marte',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'xXLulzzXx',
-        "procedencia":'Andromeda',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":1
-    },
-    {
-        "nombre":'Farruko ;)',
-        "procedencia":'PR',
-        "intentos":(Math.random() * (5-3) + 3).toFixed(0),
-        "victorias":2
-    },
-]
 
-let jugadoresOrdenados;    
 
 //#endregion
 
 //#region localstorage
-localStorage.clear()
-localStorage.setItem("Jugadores",JSON.stringify(jugadoresPrecargados));
-localStorage.setItem("JugadoresOrdenados",JSON.stringify(jugadoresOrdenados));
+
+const sincronizarStorage = () => localStorage.setItem("jugadores", JSON.stringify(jugadores))
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    jugadores = JSON.parse(localStorage.getItem('jugadores')) || [];
+
+})
+
 //#endregion
 
