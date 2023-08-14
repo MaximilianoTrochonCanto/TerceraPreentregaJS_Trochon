@@ -1,12 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
 
 :root{
-    --transparent: rgba(2, 2, 2, 0.5); 
-    --goldgrad:linear-gradient(rgb(202, 159, 250),rgb(132, 0, 255)0);
+    --transparent: rgba(2, 2, 2, 0.6); 
+    --transparent2: rgba(2, 2, 2, 0.3); 
+    --goldgrad:linear-gradient(rgb(202, 159, 250),rgb(166, 70, 255)0);
 }
 
 body{    
-     background-image: var(--goldgrad);     
+     background-image: url(../img/Background.jpg);     
     min-height: 91.8vh;
     overflow-x: hidden;
     font-family: 'Roboto', sans-serif;
@@ -18,11 +19,37 @@ body{
 }
 
 
+.mensajeResultado, h1,#parrafoV{    
+    display: inline-block;
+    padding:0 2% ;
+    color: rgb(255, 255, 255);
+    background-color: var(--transparent);  
+    border-radius: 14px;
+    
+}
+
+
+.victoria{
+    background-image: url(../img/Victoria.png);
+    background-size: cover;
+}
+
+.derrota{
+    background-image: url(../img/derrota.jpg);
+    background-size: cover;
+}
+
+
 
 h1{
-    text-align: center;
+    text-align: center;        
     font-size: 3rem;
-    margin-bottom: 2%;
+    margin-bottom: 2%;    
+}
+
+.border{
+    border-radius: 4px;
+    border: 1.5px solid black;
 }
 
 label{
@@ -38,7 +65,7 @@ div{
     padding-top:0.5%;
     width: 600px;
     margin: 0 auto;
-    background-color: rgb(253, 220, 148);
+    background-color: rgb(248, 230, 190);
 }
 
 input{
@@ -137,10 +164,12 @@ table thead tr{
 
 table th,table td{
     padding: 12px 15px;
+    color: white;
 }
 
 table tbody tr{
     border-bottom: 1px solid grey;
+    background-color: var(--transparent2);
 }
 
 #main h1,#three h2{
@@ -157,27 +186,33 @@ section{
 
 0% {
     transform: scale(1, 1);
-    opacity: 0.8;
+    
 }
 50% {
     transform: scale(1.1, 1.1);
-    opacity: 1;
+    
 }
 
 100% {
     transform: scale(1, 1);
-    opacity: 0.8;
+    
 }
 
+}
+
+h2,h3,li{
+    color: white;
 }
 
 h2,h3,p{
-    text-align: center;
+    text-align: center;    
 }
 
 #two div{
     margin-top: 1%
 }
+
+
 
 input[type=text]{
     margin: 10px auto;
@@ -189,13 +224,15 @@ input[type=text]{
 }
 
 
-.mensajeResultado{
+p{
     font-weight: bold;
-    margin-bottom: 7%;
+    margin-bottom: 2%;
 }
 
+
+
 .pError{
-    background-color: rgb(255, 35, 35,.5);
+    background-color: rgb(255, 35, 35,.8);
     text-align: center;
     color: white;
 }

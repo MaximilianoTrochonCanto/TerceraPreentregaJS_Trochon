@@ -56,6 +56,7 @@ const crearTabla = () => tabla.innerHTML = `<thead><tr><th>Nombre</th><th>Email<
 
 function crearLinks(top5) {
     let li1 = document.createElement("li");
+    (modo == "intentos")?tablaJugadores.classList.add("border"):tablaVs.classList.add("border")
     li1.textContent = "Ver todos"
     let h2;
     let ul;
@@ -329,7 +330,7 @@ const figuraEnTop5 = function (objeto, array) {
 
 
 function tuResultado(victoria, texto) {
-    (victoria) ? document.querySelector("#body").style.background = colorVictorioso : document.querySelector("#body").style.background = 'red';    
+    (victoria) ? document.querySelector("#body").classList.add("victoria") : document.querySelector("#body").classList.add("derrota")    
     document.querySelector("#boton").disabled = true
     document.querySelector("#botonVs").disabled = true
     let posP = 1;
@@ -353,6 +354,9 @@ function parrafoListaVacia(elemento) {
     p.textContent = "No hubo ningun ganador hoy"
     elemento.appendChild(p);
 }
+
+
+
 //#endregion
 
 //#region Objetos
