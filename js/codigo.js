@@ -115,6 +115,7 @@ function consultarJugadorNuevo() {
         document.querySelector("#errorIngreso").innerHTML = "revisa los datos"
         document.querySelector("#errorIngreso").classList.add("pError")
     } else {
+        document.querySelector("#errorIngreso").classList.remove("pError")
         jugadorNuevo.nombre = nombreJugador;
         jugadorNuevo.procedencia = procedenciaJugador;
         jugadorNuevo.email = emailJugador;
@@ -191,9 +192,11 @@ document.querySelector("#boton").addEventListener("click", ingresarNumero)
 function ingresarNumero() {
     let numero = Number(document.querySelector("#numero").value);
 
-    if (numero > 100 || numero < 1) parrafosMensaje[0].innerHTML = "El número debe estar entre 1 y 100."
-    else
-
+    if (numero > 100 || numero < 1){
+     parrafosMensaje[0].innerHTML = "El número debe estar entre 1 y 100."
+     parrafosMensaje[0].classList.add("pError")    
+    }else{
+    parrafosMensaje[0].classList.remove("pError")    
         for (let i = 0; i <= chances; i++) {
             intentos++;
             if (!consultarNumero(numero)) {
@@ -205,7 +208,7 @@ function ingresarNumero() {
         mostrarIngreso()
     }
     else if (intentos == chances) tuResultado(false, "Lo sentimos, perdiste la partida. El correcto erá: " + ganador + ". ");
-
+    }
 
 }
 
@@ -215,8 +218,11 @@ document.querySelector("#botonVs").addEventListener("click", ingresarNumeroVs)
 
 function ingresarNumeroVs() {
     let tuNumero = Number(document.querySelector("#tuNumero").value);
-    if (tuNumero > 20 || tuNumero < 1) parrafosMensaje[1].innerHTML = "El número debe estar entre 1 y 20."
-    else {
+    if (tuNumero > 20 || tuNumero < 1){
+     parrafosMensaje[1].innerHTML = "El número debe estar entre 1 y 20."
+     parrafosMensaje[1].classList.add("pError")    
+    }else {
+        parrafosMensaje[1].classList.remove("pError")    
         if (!Boolean(ganasteTu ^ ganoRival)) {
             while (!noEsta(numeroRival, numerosElegidosRival)) {
                 numeroRival = Math.floor(Math.random() * 20) + 1;
@@ -376,3 +382,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 //#endregion
 
+//#region bola
+
+//#endregion
