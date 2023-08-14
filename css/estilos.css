@@ -97,6 +97,7 @@ ul{
 
 li{
     transition-duration:0.3s;
+    text-decoration: underline;
 }
 
 li:hover{
@@ -182,6 +183,12 @@ input[type=text]{
 
 #three h2{
     color: black;
+}
+
+
+.mensajeResultado{
+    font-weight: bold;
+    margin-bottom: 7%;
 }
 
 .pError{
