@@ -191,7 +191,7 @@ document.querySelector("#boton").addEventListener("click", ingresarNumero)
 function ingresarNumero() {
     let numero = Number(document.querySelector("#numero").value);
 
-    if (numero > 100 || numero < 1) alert("El número debe estar entre 1 y 100.")
+    if (numero > 100 || numero < 1) parrafosMensaje[0].innerHTML = "El número debe estar entre 1 y 100."
     else
 
         for (let i = 0; i <= chances; i++) {
@@ -215,7 +215,7 @@ document.querySelector("#botonVs").addEventListener("click", ingresarNumeroVs)
 
 function ingresarNumeroVs() {
     let tuNumero = Number(document.querySelector("#tuNumero").value);
-    if (tuNumero > 20 || tuNumero < 1) alert("El número debe estar entre 1 y 20.")
+    if (tuNumero > 20 || tuNumero < 1) parrafosMensaje[1].innerHTML = "El número debe estar entre 1 y 20."
     else {
         if (!Boolean(ganasteTu ^ ganoRival)) {
             while (!noEsta(numeroRival, numerosElegidosRival)) {
@@ -242,7 +242,7 @@ function ingresarNumeroVs() {
 function reiniciarJuego() {
     numerosElegidosRival = [];
     ganador = Math.floor(Math.random() * 20) + 1;
-    alert("Empataron. Comiencen de nuevo!")
+    parrafosMensaje[1].innerHTML = "Empataron. Comiencen de nuevo!"
     console.log(ganador)
 }
 
