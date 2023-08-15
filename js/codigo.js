@@ -7,11 +7,14 @@ let tablaVs = document.querySelector("#tablaVs");
 let tablaJugadores = document.querySelector("#top5");
 let h2Single = tablaJugadores.getElementsByTagName("h2")[0]
 let h2Vs = tablaVs.getElementsByTagName("h2")[0]
+let textoNumerosElegidos = "Numeros elegidos: "
 const chances = 5;
 var ganasteTu, ganoRival = false;
 let ulSingle = tablaJugadores.getElementsByTagName("ul")[0];
 let ulVs = tablaVs.getElementsByTagName("ul")[0];
 var jugadores, numerosElegidosRival = new Array();
+let numerosElegidosVictorias = []
+let numerosElegidosIntentos = []
 const colorVictorioso = 'rgb(171, 250, 171)';
 const refresca = "Si querés volver a jugar, refrescá la página.";
 let parrafosMensaje = document.getElementsByClassName("mensajeResultado")
@@ -39,16 +42,17 @@ function singlePlayer() {
     document.getElementById("one").style.display = "block";
     document.getElementById("three").style.display = "none";
     ganador = Math.floor(Math.random() * 100) + 1;
-    console.log("Ganador: " + ganador)
     modo = "intentos"
 }
+
+
 
 function vsBtn() {
     document.getElementById("main").style.display = "none"
     document.getElementById("two").style.display = "block"
     document.getElementById("three").style.display = "none"
     ganador = Math.floor(Math.random() * 20) + 1;
-    console.log("Ganador: " + ganador)
+
     modo = "victorias"
 }
 
@@ -56,7 +60,7 @@ const crearTabla = () => tabla.innerHTML = `<thead><tr><th>Nombre</th><th>Email<
 
 function crearLinks(top5) {
     let li1 = document.createElement("li");
-    (modo == "intentos")?tablaJugadores.classList.add("border"):tablaVs.classList.add("border")
+    (modo == "intentos") ? tablaJugadores.classList.add("border") : tablaVs.classList.add("border")
     li1.textContent = "Ver todos"
     let h2;
     let ul;
@@ -96,30 +100,38 @@ const agregarFelicitaciones = function (texto, elemento) {
 }
 
 function mostrarIngreso() {
-    (modo == "intentos")?parrafosMensaje[0].innerHTML = "":parrafosMensaje[1].innerHTML = ""
+    (modo == "intentos") ? parrafosMensaje[0].innerHTML = "" : parrafosMensaje[1].innerHTML = ""
     document.getElementById("three").style.display = "block";
 }
 
 
 
 document.querySelector("#btnIngresarJugador").addEventListener("click", consultarJugadorNuevo)
-document.querySelector("#txtNombre").addEventListener("input",()=>{
+document.querySelector("#txtNombre").addEventListener("input", () => {
     document.querySelector("#tuNombre").textContent = document.querySelector("#txtNombre").value
 })
 
+
+document.getElementById("txtEmail").addEventListener("keydown", function (evt) {
+    if (evt.code == "Enter") consultarJugadorNuevo()
+})
+document.getElementById("txtNombre").addEventListener("keydown", function (evt) {
+    if (evt.code == "Enter") consultarJugadorNuevo()
+})
+
 function consultarJugadorNuevo() {
-    
+    let textoError = "El nombre y correo son mandatorios, revisa los datos por favor."
     nombreJugador = document.querySelector("#txtNombre").value;
     procedenciaJugador = document.querySelector("#txtProcedencia").value;
     emailJugador = document.querySelector("#txtEmail").value
-    if (nombreJugador == "" || emailJugador == "") {
-        document.querySelector("#errorIngreso").innerHTML = "revisa los datos"
+    if (nombreJugador == "" || !validarMail(emailJugador)) {
+        (nombreJugador == "") ? document.querySelector("#errorIngreso").innerHTML = textoError : document.querySelector("#errorIngreso").innerHTML = "Ingresa un correo valido por favor";
         document.querySelector("#errorIngreso").classList.add("pError")
-        setTimeout(()=>{
+        setTimeout(() => {
             document.querySelector("#errorIngreso").classList.remove("pError");
             document.querySelector("#errorIngreso").innerHTML = "";
-        },3000)  
-    } else {        
+        }, 3000)
+    } else {
         jugadorNuevo.nombre = nombreJugador;
         jugadorNuevo.procedencia = procedenciaJugador;
         jugadorNuevo.email = emailJugador;
@@ -143,26 +155,31 @@ function consultarJugadorNuevo() {
             }
         }
         sincronizarStorage();
-        
-        (modo == "intentos")?singlePlayer():document.getElementById("three").style.display = "none";                
+
+        (modo == "intentos") ? singlePlayer() : document.getElementById("three").style.display = "none";
         tuResultado(true, `Felicidades ${jugadorNuevo.nombre}, ganaste el partido! `);
-        
-        
+
+
     }
+}
+
+function validarMail(email) {
+    var chars = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    return email.match(chars)
 }
 
 
 
-function ordenarJugadores() {    
+function ordenarJugadores() {
     let jugadoresOrdenados;
     (modo == "intentos") ? jugadoresOrdenados = jugadores.sort((a, b) => a.intentos - b.intentos || a.nombre.localeCompare(b.nombre)).filter((j) => j.intentos > 0) : jugadoresOrdenados = jugadores.sort((a, b) => b.victorias - a.victorias || a.nombre.localeCompare(b.nombre)).filter((j) => j.victorias > 0)
     return jugadoresOrdenados;
 }
 
-function sobrescribirDatos(jugadorEspecifico){
+function sobrescribirDatos(jugadorEspecifico) {
     obtenerJugador(jugadorEspecifico.email).procedencia = jugadorEspecifico.procedencia;
     obtenerJugador(jugadorEspecifico.email).nombre = jugadorEspecifico.nombre;
-    (modo == "intentos")?sobrescribirIntentos(jugadorEspecifico):sobrescribirVictorias(jugadorEspecifico)
+    (modo == "intentos") ? sobrescribirIntentos(jugadorEspecifico) : sobrescribirVictorias(jugadorEspecifico)
 }
 
 function sobrescribirIntentos(jugadorEspecifico) {
@@ -194,17 +211,23 @@ function numeroIncorrecto(numero) {
 
 document.querySelector("#boton").addEventListener("click", ingresarNumero)
 
+document.getElementById("numero").addEventListener("keyup", function (evt) {
+    if (evt.code == "Enter" && !document.querySelector("#boton").disabled) ingresarNumero()
+})
+
 function ingresarNumero() {
     let numero = Number(document.querySelector("#numero").value);
 
-    if (numero > 100 || numero < 1){
+    if (numero > 100 || numero < 1) {
         parrafosMensaje[0].innerHTML = "El número debe estar entre 1 y 100."
-        parrafosMensaje[0].classList.add("pError")    
-        setTimeout(()=>{
+        parrafosMensaje[0].classList.add("pError")
+        setTimeout(() => {
             parrafosMensaje[0].classList.remove("pError");
             parrafosMensaje[0].innerHTML = "";
-        },3000)    
-    }else{    
+        }, 3000)
+    } else {
+        numerosElegidosIntentos.push(numero)
+        document.querySelector("#numerosElegidosIntentos").innerHTML = textoNumerosElegidos + [...numerosElegidosIntentos]
         for (let i = 0; i <= chances; i++) {
             intentos++;
             if (!consultarNumero(numero)) {
@@ -212,55 +235,65 @@ function ingresarNumero() {
             }
             break;
         }
-    if (consultarNumero(numero)) {
-        mostrarIngreso()
+        if (consultarNumero(numero)) {
+            mostrarIngreso()
+            document.querySelector("#boton").disabled = true
+        } else if (intentos == chances) {
+            tuResultado(false, "Lo sentimos, perdiste la partida. El correcto erá: " + ganador + ". ")
+            document.querySelector("#boton").disabled = true
+        }
     }
-    else if (intentos == chances) tuResultado(false, "Lo sentimos, perdiste la partida. El correcto erá: " + ganador + ". ");
-    }
-
 }
 
 document.querySelector("#botonVs").addEventListener("click", ingresarNumeroVs)
 
-
+document.getElementById("tuNumero").addEventListener("keyup", function (evt) {
+    if (evt.code == "Enter" && !document.querySelector("#botonVs").disabled) ingresarNumeroVs()
+})
 
 function ingresarNumeroVs() {
     let tuNumero = Number(document.querySelector("#tuNumero").value);
-    if (tuNumero > 20 || tuNumero < 1){
-     parrafosMensaje[1].innerHTML = "El número debe estar entre 1 y 20."
-     parrafosMensaje[1].classList.add("pError")    
-     setTimeout(()=>{
-        parrafosMensaje[1].classList.remove("pError");
-        parrafosMensaje[1].innerHTML = "";
-    },3000)  
-    }else {        
+    if (tuNumero > 20 || tuNumero < 1) {
+        parrafosMensaje[1].innerHTML = "El número debe estar entre 1 y 20."
+        parrafosMensaje[1].classList.add("pError")
+        setTimeout(() => {
+            parrafosMensaje[1].classList.remove("pError");
+            parrafosMensaje[1].innerHTML = "";
+        }, 3000)
+    } else {
+        numerosElegidosVictorias.push(tuNumero)
         if (!Boolean(ganasteTu ^ ganoRival)) {
-            while (!noEsta(numeroRival, numerosElegidosRival)) {
+            while (!noEsta(numeroRival, numerosElegidosRival) || !noEsta(numeroRival, numerosElegidosVictorias)) {
                 numeroRival = Math.floor(Math.random() * 20) + 1;
             }
+            document.querySelector("#numerosElegidosVictoriasTu").innerHTML = textoNumerosElegidos + [numerosElegidosVictorias]
             document.querySelector("#respuestaRival").innerHTML = ` ${numeroRival}`
             ganasteTu = consultarNumero(tuNumero)
             ganoRival = consultarNumero(numeroRival)
             numerosElegidosRival.push(numeroRival)
+            document.querySelector("#numerosElegidosVictoriasRival").innerHTML = textoNumerosElegidos + [...numerosElegidosRival]
         }
-        
-        console.log(Boolean(ganasteTu ^ ganoRival))
-        if (Boolean(ganasteTu ^ ganoRival)) {            
-            (ganasteTu) ? mostrarIngreso() : tuResultado(false, "Gano tu Rival. ", "victorias");            
+
+
+        if (Boolean(ganasteTu ^ ganoRival)) {
+            (ganasteTu) ? mostrarIngreso() : tuResultado(false, "Gano tu Rival. ", "victorias");
+            document.querySelector("#botonVs").disabled = true;
         } else {
             (ganasteTu && ganoRival) ? reiniciarJuego() : numeroIncorrecto()
         }
 
-        
+
     }
 
 }
 
 function reiniciarJuego() {
     numerosElegidosRival = [];
+    document.querySelector("#numerosElegidosVictoriasTu").innerHTML = ""
+    document.querySelector("#numerosElegidosVictoriasRival").innerHTML = ""
     ganador = Math.floor(Math.random() * 20) + 1;
     parrafosMensaje[1].innerHTML = "Empataron. Comiencen de nuevo!"
-    console.log(ganador)
+
 }
 
 function noEsta(num, arr) {
@@ -327,7 +360,7 @@ function pistaNumero(numero, chances) {
 
 const figuraEnTop5 = function (objeto, array) {
     let titulo = elemento = "";
-    (modo == "intentos") ? titulo = "Sos el mejor jugador. Te recomendamos que jueges la quiniela." : titulo = "Sos el jugador con mas victorias!";
+    (modo == "intentos") ? titulo = "Estas en primer lugar! Te recomendamos que jueges la quiniela." : titulo = "Estas en primer lugar! Devolvenos la bola de cristal.";
     (modo == "intentos") ? elemento = tablaJugadores : elemento = tablaVs;;
     if (objeto.email == array[0].email) agregarFelicitaciones(titulo, elemento)
     for (let i = 1; i < array.length; i++)
@@ -340,12 +373,11 @@ const figuraEnTop5 = function (objeto, array) {
 
 
 function tuResultado(victoria, texto) {
-    (victoria) ? document.querySelector("#body").classList.add("victoria") : document.querySelector("#body").classList.add("derrota")    
-    document.querySelector("#boton").disabled = true
+    (victoria) ? document.querySelector("#body").classList.add("victoria") : document.querySelector("#body").classList.add("derrota")
     document.querySelector("#botonVs").disabled = true
     let posP = 1;
-    if(modo == "intentos")posP = 0;    
-    parrafosMensaje[posP].innerHTML = texto + refresca;    
+    if (modo == "intentos") posP = 0;
+    parrafosMensaje[posP].innerHTML = texto + refresca;
     let top5 = ordenarJugadores().slice(0, 5);
     if (top5.length != 0) {
         crearTabla();
@@ -372,9 +404,9 @@ function parrafoListaVacia(elemento) {
 
 //#region Objetos
 class Jugador {
-    constructor(n,e, p, i, v) {
+    constructor(n, e, p, i, v) {
         this.nombre = n,
-        this.email = e,
+            this.email = e,
             this.procedencia = p,
             this.intentos = i,
             this.victorias = v

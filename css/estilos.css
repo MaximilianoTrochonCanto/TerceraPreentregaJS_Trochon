@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
 
+html{
+    padding: 0;
+}
+
 :root{
     --transparent: rgba(2, 2, 2, 0.6); 
     --transparent2: rgba(2, 2, 2, 0.3); 
@@ -8,8 +12,9 @@
 
 body{    
      background-image: url(../img/Background.jpg);     
-    min-height: 100vh;
-    overflow-x: hidden;
+    min-height: 90vh;
+    
+    /* overflow-x: hidden; */
     font-family: 'Roboto', sans-serif;
     -webkit-transition: all 1s ease-in-out;
     -moz-transition: all 1s ease-in-out;
@@ -89,6 +94,7 @@ input[type=button]{
     transition-duration: 0.3s;
 }
 
+
 .boton:hover:enabled{
     padding: 1% 2%;
 }
@@ -132,10 +138,11 @@ img{
 li{
     transition-duration:0.3s;
     text-decoration: underline;
+    background-color: var(--transparent2);
 }
 
 li:hover{
-    color: rgb(116, 98, 0);
+    color: rgb(219, 185, 233);
 }
 
 li:focus{
@@ -153,9 +160,7 @@ table{
     text-align: left;
 }
 
-h2,h3{
-    color: var(--transparent);    
-}
+
 
 table thead tr{    
     color: rgb(230, 227, 227);   
@@ -203,10 +208,15 @@ section{
 
 h2,h3,li{
     color: white;
+    background-color: var(--transparent2);
 }
 
 h2,h3,p{
     text-align: center;    
+}
+
+#three h2{
+    background: none;
 }
 
 #two div{
@@ -236,4 +246,5 @@ p{
     background-color: rgb(255, 35, 35,.8);
     text-align: center;
     color: white;
+    margin-bottom: 0;
 }
