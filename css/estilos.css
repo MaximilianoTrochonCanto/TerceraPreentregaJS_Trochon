@@ -8,7 +8,7 @@
 
 body{    
      background-image: url(../img/Background.jpg);     
-    min-height: 91.8vh;
+    min-height: 100vh;
     overflow-x: hidden;
     font-family: 'Roboto', sans-serif;
     -webkit-transition: all 1s ease-in-out;
@@ -37,6 +37,7 @@ body{
 .derrota{
     background-image: url(../img/derrota.jpg);
     background-size: cover;
+    ;
 }
 
 

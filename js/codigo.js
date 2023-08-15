@@ -67,7 +67,7 @@ function crearLinks(top5) {
     li1.addEventListener("click", function () {
         h2.innerHTML = "Ganadores de hoy"
         crearTabla();
-        (modo == "intentos") ? rellenarTabla(ordenarJugadores(modo)) : rellenaTablaVictorias(ordenarJugadores(modo))
+        (modo == "intentos") ? rellenarTabla(ordenarJugadores()) : rellenaTablaVictorias(ordenarJugadores())
     })
     let li2 = document.createElement("li");
     li2.textContent = "Ver top 5"
@@ -115,14 +115,17 @@ function consultarJugadorNuevo() {
     if (nombreJugador == "" || emailJugador == "") {
         document.querySelector("#errorIngreso").innerHTML = "revisa los datos"
         document.querySelector("#errorIngreso").classList.add("pError")
-    } else {
-        document.querySelector("#errorIngreso").classList.remove("pError")
+        setTimeout(()=>{
+            document.querySelector("#errorIngreso").classList.remove("pError");
+            document.querySelector("#errorIngreso").innerHTML = "";
+        },3000)  
+    } else {        
         jugadorNuevo.nombre = nombreJugador;
         jugadorNuevo.procedencia = procedenciaJugador;
         jugadorNuevo.email = emailJugador;
         if (modo == "intentos") {
             jugadorNuevo.intentos = intentos;
-            if (!existeJugador(jugadorNuevo.nombre, jugadorNuevo.email)) {
+            if (!existeJugador(jugadorNuevo.email)) {
                 jugadorNuevo.victorias = 0;
                 jugadores.unshift(jugadorNuevo)
             } else {
@@ -131,7 +134,7 @@ function consultarJugadorNuevo() {
         } else {
             jugadorNuevo.nombre = nombreJugador;
             jugadorNuevo.procedencia = procedenciaJugador;
-            if (!existeJugador(jugadorNuevo.nombre, jugadorNuevo.email)) {
+            if (!existeJugador(jugadorNuevo.email)) {
                 jugadorNuevo.victorias = 1;
                 jugadorNuevo.intentos = 0;
                 jugadores.unshift(jugadorNuevo)
@@ -150,28 +153,29 @@ function consultarJugadorNuevo() {
 
 
 
-function ordenarJugadores(criterio) {
+function ordenarJugadores() {    
     let jugadoresOrdenados;
-    (criterio == "intentos") ? jugadoresOrdenados = jugadores.sort((a, b) => a.intentos - b.intentos || a.nombre.localeCompare(b.nombre)).filter((j) => j.intentos > 0) : jugadoresOrdenados = jugadores.sort((a, b) => b.victorias - a.victorias || a.nombre.localeCompare(b.nombre)).filter((j) => j.victorias > 0)
+    (modo == "intentos") ? jugadoresOrdenados = jugadores.sort((a, b) => a.intentos - b.intentos || a.nombre.localeCompare(b.nombre)).filter((j) => j.intentos > 0) : jugadoresOrdenados = jugadores.sort((a, b) => b.victorias - a.victorias || a.nombre.localeCompare(b.nombre)).filter((j) => j.victorias > 0)
     return jugadoresOrdenados;
 }
 
 function sobrescribirDatos(jugadorEspecifico){
-    obtenerJugador(jugadorEspecifico.nombre,jugadorEspecifico.email).procedencia = jugadorEspecifico.procedencia;
+    obtenerJugador(jugadorEspecifico.email).procedencia = jugadorEspecifico.procedencia;
+    obtenerJugador(jugadorEspecifico.email).nombre = jugadorEspecifico.nombre;
     (modo == "intentos")?sobrescribirIntentos(jugadorEspecifico):sobrescribirVictorias(jugadorEspecifico)
 }
 
 function sobrescribirIntentos(jugadorEspecifico) {
-    if (jugadorEspecifico.intentos < obtenerJugador(jugadorEspecifico.nombre, jugadorEspecifico.email).intentos) obtenerJugador(jugadorEspecifico.nombre, jugadorEspecifico.email).intentos = jugadorEspecifico.intentos
+    if (jugadorEspecifico.intentos < obtenerJugador(jugadorEspecifico.email).intentos) obtenerJugador(jugadorEspecifico.email).intentos = jugadorEspecifico.intentos
 }
 
 function sobrescribirVictorias(jugadorEspecifico) {
-    obtenerJugador(jugadorEspecifico.nombre, jugadorEspecifico.email).victorias++;
+    obtenerJugador(jugadorEspecifico.email).victorias++;
 }
 
-function existeJugador(nombreJ, emailJ) {
+function existeJugador(emailJ) {
     let retorno;
-    (obtenerJugador(nombreJ, emailJ) != null) ? retorno = true : retorno = false;
+    (obtenerJugador(emailJ) != null) ? retorno = true : retorno = false;
     return retorno;
 }
 
@@ -194,10 +198,13 @@ function ingresarNumero() {
     let numero = Number(document.querySelector("#numero").value);
 
     if (numero > 100 || numero < 1){
-     parrafosMensaje[0].innerHTML = "El número debe estar entre 1 y 100."
-     parrafosMensaje[0].classList.add("pError")    
-    }else{
-    parrafosMensaje[0].classList.remove("pError")    
+        parrafosMensaje[0].innerHTML = "El número debe estar entre 1 y 100."
+        parrafosMensaje[0].classList.add("pError")    
+        setTimeout(()=>{
+            parrafosMensaje[0].classList.remove("pError");
+            parrafosMensaje[0].innerHTML = "";
+        },3000)    
+    }else{    
         for (let i = 0; i <= chances; i++) {
             intentos++;
             if (!consultarNumero(numero)) {
@@ -222,8 +229,11 @@ function ingresarNumeroVs() {
     if (tuNumero > 20 || tuNumero < 1){
      parrafosMensaje[1].innerHTML = "El número debe estar entre 1 y 20."
      parrafosMensaje[1].classList.add("pError")    
-    }else {
-        parrafosMensaje[1].classList.remove("pError")    
+     setTimeout(()=>{
+        parrafosMensaje[1].classList.remove("pError");
+        parrafosMensaje[1].innerHTML = "";
+    },3000)  
+    }else {        
         if (!Boolean(ganasteTu ^ ganoRival)) {
             while (!noEsta(numeroRival, numerosElegidosRival)) {
                 numeroRival = Math.floor(Math.random() * 20) + 1;
@@ -261,9 +271,9 @@ function noEsta(num, arr) {
 }
 
 
-function obtenerJugador(nombreJugador, emailJugador) {
+function obtenerJugador(emailJugador) {
     for (let i = 0; i < jugadores.length; i++) {
-        if (jugadores[i].nombre == nombreJugador && jugadores[i].email == emailJugador) return jugadores[i];
+        if (jugadores[i].email == emailJugador) return jugadores[i];
     }
     return null;
 }
@@ -319,7 +329,7 @@ const figuraEnTop5 = function (objeto, array) {
     let titulo = elemento = "";
     (modo == "intentos") ? titulo = "Sos el mejor jugador. Te recomendamos que jueges la quiniela." : titulo = "Sos el jugador con mas victorias!";
     (modo == "intentos") ? elemento = tablaJugadores : elemento = tablaVs;;
-    if (objeto.nombre == array[0].nombre && objeto.procedencia == array[0].procedencia) agregarFelicitaciones(titulo, elemento)
+    if (objeto.email == array[0].email) agregarFelicitaciones(titulo, elemento)
     for (let i = 1; i < array.length; i++)
         if (objeto == array[i]) {
             agregarFelicitaciones('Felicitaciones! Estas en el top 5.', elemento);
@@ -336,7 +346,7 @@ function tuResultado(victoria, texto) {
     let posP = 1;
     if(modo == "intentos")posP = 0;    
     parrafosMensaje[posP].innerHTML = texto + refresca;    
-    let top5 = ordenarJugadores(modo).slice(0, 5);
+    let top5 = ordenarJugadores().slice(0, 5);
     if (top5.length != 0) {
         crearTabla();
         (modo == "intentos") ? rellenarTabla(top5) : rellenaTablaVictorias(top5);
@@ -351,6 +361,7 @@ function tuResultado(victoria, texto) {
 
 function parrafoListaVacia(elemento) {
     let p = document.createElement("p")
+    p.style.color = "white";
     p.textContent = "No hubo ningun ganador hoy"
     elemento.appendChild(p);
 }
